@@ -1,0 +1,198 @@
+// Manage errors
+IF m_1=0 OR m_2=0 OR m_3=0 OR m_4=0 OR m_5=0 OR... 
+	k_1=0 OR k_2=0 OR k_3=0 OR k_4=0 OR k_5=0 THEN
+	TableDeleteAll(Table1)
+	TableDeleteAll(Table2)
+	TableDeleteAll(Table3)
+	TableDeleteAll(Table4)
+	TableDeleteAll(Table5)
+	grDeleteSeries(Chart1)
+	grAddData(Chart1,1,1,0)
+	grAddData(Chart1,2,1,0)
+	grAddData(Chart1,3,1,0)
+	grAddData(Chart1,4,1,0)
+	grAddData(Chart1,5,1,0)
+	ChartSeries()
+	grDraw(Chart1)
+	Error("Please generate results first then try again.")	
+	RETURN
+END
+IF  dt_min = 0 THEN
+	TableDeleteAll(Table1)
+	TableDeleteAll(Table2)
+	TableDeleteAll(Table3)
+	TableDeleteAll(Table4)
+	TableDeleteAll(Table5)
+	grDeleteSeries(Chart1)
+	grAddData(Chart1,1,1,0)
+	grAddData(Chart1,2,1,0)
+	grAddData(Chart1,3,1,0)
+	grAddData(Chart1,4,1,0)
+	grAddData(Chart1,5,1,0)
+	ChartSeries()
+	grDraw(Chart1)
+	Error("Please enter a valid value for (Minimum dt) then try again")
+	ReturnToCapture(dt_min)
+END
+IF  dt_max = 0 THEN
+	TableDeleteAll(Table1)
+	TableDeleteAll(Table2)
+	TableDeleteAll(Table3)
+	TableDeleteAll(Table4)
+	TableDeleteAll(Table5)
+	grDeleteSeries(Chart1)
+	grAddData(Chart1,1,1,0)
+	grAddData(Chart1,2,1,0)
+	grAddData(Chart1,3,1,0)
+	grAddData(Chart1,4,1,0)
+	grAddData(Chart1,5,1,0)
+	ChartSeries()
+	grDraw(Chart1)
+	Error("Please enter a valid value for (Maximum dt) then try again")
+	ReturnToCapture(dt_min)
+END
+IF  t_Value = 0 THEN
+	TableDeleteAll(Table1)
+	TableDeleteAll(Table2)
+	TableDeleteAll(Table3)
+	TableDeleteAll(Table4)
+	TableDeleteAll(Table5)
+	grDeleteSeries(Chart1)
+	grAddData(Chart1,1,1,0)
+	grAddData(Chart1,2,1,0)
+	grAddData(Chart1,3,1,0)
+	grAddData(Chart1,4,1,0)
+	grAddData(Chart1,5,1,0)
+	ChartSeries()
+	grDraw(Chart1)
+	Error("Please enter a valid value for (duration) then try again")
+	ReturnToCapture(t_Value)
+END
+IF  Threshold_Value = 0 THEN
+	TableDeleteAll(Table1)
+	TableDeleteAll(Table2)
+	TableDeleteAll(Table3)
+	TableDeleteAll(Table4)
+	TableDeleteAll(Table5)
+	grDeleteSeries(Chart1)
+	grAddData(Chart1,1,1,0)
+	grAddData(Chart1,2,1,0)
+	grAddData(Chart1,3,1,0)
+	grAddData(Chart1,4,1,0)
+	grAddData(Chart1,5,1,0)
+	ChartSeries()
+	grDraw(Chart1)
+	Error("Please enter a valid value for (Tthreshold) then try again")
+	ReturnToCapture(Threshold_Value)
+END
+IF xt_0_Value = 0 AND vt_0_Value = 0 THEN
+	Error("X and V initial values can not be both equal to zero!" + CR + "Please change either X or V initial value then try again.")
+	ReturnToCapture(xt_0_Value)
+END
+IF CheckBox1 = 0 AND CheckBox2 = 0 AND CheckBox3 = 0 AND CheckBox4 = 0 AND CheckBox5 = 0 THEN
+	Error("Please select at least one blade to deal with")
+	RETURN
+END
+
+//Initial views
+TableDeleteAll(Table1)
+TableDeleteAll(Table2)
+TableDeleteAll(Table3)
+TableDeleteAll(Table4)
+TableDeleteAll(Table5)
+grDeleteSeries(Chart1)
+grAddData(Chart1,1,1,0)
+grAddData(Chart1,2,1,0)
+grAddData(Chart1,3,1,0)
+grAddData(Chart1,4,1,0)
+grAddData(Chart1,5,1,0)
+ChartSeries()
+grDraw(Chart1)
+dt is numeric = dt_min
+TimeDuration is numeric = t_Value
+LoopDuration is numeric = TimeDuration / dt 
+v1 is numeric = vt_0_Value
+x1 is numeric = xt_0_Value
+v2 is numeric = vt_0_Value  
+x2 is numeric = xt_0_Value
+v3 is numeric = vt_0_Value  
+x3 is numeric = xt_0_Value
+v4 is numeric = vt_0_Value  
+x4 is numeric = xt_0_Value
+v5 is numeric = vt_0_Value  
+x5 is numeric = xt_0_Value
+T,kn1,kn2,kn3,kn4,kn5,kn6,ErrorFactor,Scaler,RK4V1,RK5V1 are numeric 
+OpenChild(Wait_win)
+HourGlass(True)
+TableAdd(Table1, 0 + TAB + 0 + TAB + xt_0_Value + TAB  + vt_0_Value)
+TableAdd(Table2, 0 + TAB + 0 + TAB + xt_0_Value + TAB  + vt_0_Value)
+TableAdd(Table3, 0 + TAB + 0 + TAB + xt_0_Value + TAB  + vt_0_Value)
+TableAdd(Table4, 0 + TAB + 0 + TAB + xt_0_Value + TAB  + vt_0_Value)
+TableAdd(Table5, 0 + TAB + 0 + TAB + xt_0_Value + TAB  + vt_0_Value)
+
+//.......................................Apply runge kutta 4th 5th fehlberg for blade 1.......................................
+IF CheckBox1 = 1
+	FOR n = 1 TO 100000
+		Stage1_b1: 
+		IF dt_min*n >= t_Value THEN
+			BREAK
+		END
+		kn1 = dt*(-(k_1/m_1*x1)-(c_1/m_1*v1))
+		kn2 = dt*(-(k_1/m_1*(x1+dt/4))-(c_1/m_1*(v1+kn1/4)))
+		kn3 = dt*(-(k_1/m_1*(x1+3*dt/8))-(c_1/m_1*(v1+(3/32*kn1+9/32*kn2))))
+		kn4 = dt*(-(k_1/m_1*(x1+12*dt/13))-(c_1/m_1*(v1+(1932/2197*kn1-7200/2197*kn2+7296/2197*kn3))))
+		kn5 = dt*(-(k_1/m_1*(x1+dt))-(c_1/m_1*(v1+(439/216*kn1-8*kn2+3680/513*kn3-845/4104*kn4))))
+		kn6 = dt*(-(k_1/m_1*(x1+dt/2))-(c_1/m_1*(v1-8/27*kn1+2*kn2-3544/2565*kn3+1859/4104*kn4-11/40*kn5)))
+		RK4V1 = v1+25*kn1/216+1408*kn3/2565+2197*kn4/4104-kn5/5
+		RK5V1 = v1+16*kn1/135+6656*kn3/12825+28561*kn4/56430-9*kn5/50+2*kn6/55
+	    ErrorFactor = Abs(RK5V1-RK4V1)/dt
+	    IF ErrorFactor <= Threshold_Value THEN
+	    	v1 = RK4V1
+			x1 = x1+dt*v1
+			T = dt_min*n 
+			TableAdd(Table1, n + TAB + T + TAB + x1 + TAB  + v1)
+			grAddData(Chart1,1,n,x1)
+		ELSE
+			IF (x1+dt) > xt_0_Value THEN
+ 				dt=xt_0_Value-x1
+			END
+			IF dt <= 0 THEN
+				dt = dt_min
+			END
+			Scaler = 0.84*(Threshold_Value/ErrorFactor)^(1/4)   
+			IF Scaler <= 0.125
+				dt=0.1*dt	
+			ELSE IF Scaler >=4
+				dt=4*dt	  
+			ELSE
+				dt=Scaler*dt
+			END
+			IF dt>dt_max
+				dt=dt_max
+			END
+			IF (x1+dt_min) >= xt_0_Value THEN
+				dt=xt_0_Value-x1
+			END
+			IF x1 < xt_0_Value THEN
+				BREAK
+			END
+			GOTO Stage1_b1
+		END		
+	END
+	ELSE
+	TableDeleteAll(Table1)
+END
+    
+
+// Prepare the table
+TableDisplay(Table1)
+TableDisplay(Table2)
+TableDisplay(Table3)
+TableDisplay(Table4)
+TableDisplay(Table5)
+
+// Prepare the chart
+grDraw(Chart1)
+ChartSeries()
+HourGlass(False)
+Close(Wait_win)
