@@ -1,0 +1,61 @@
+IF Profile_Combo..DisplayedValue = "" OR RCP_EDT = "" OR Subject_EDT = "" OR Message_EDT = "" THEN
+	Open(Err16_Win)
+	RETURN
+END
+Wait(100)
+
+// Define number of emails
+Total_EDT = StringCount(RCP_EDT, ",") 
+
+// Start a SMTP session
+HourGlass(True)
+ProgressBar1..Value = 0
+MySession is EmailSMTPSession
+HReadSeekFirst(Outgoing,SenderName,Profile_Combo..DisplayedValue)
+MySession.Name = Outgoing.Email
+MySession.Password = Outgoing.Password
+MySession.ServerAddress = Outgoing.ServerName
+MySession.Port = Outgoing.PortNumber
+MySession.Option = Outgoing.SecurityType
+EmailStartSession(MySession)
+EmailProgressBar(ProgressBar1)
+
+// Build an email
+MyEmail is Email
+MyEmail..HTML = Message_EDT
+MyEmail..Subject = AnsiToUnicode(Subject_EDT,charsetArabic)
+MyEmail..Sender = MySession.Name
+Number_EDT = 0
+myAttach is EmailAttach
+
+FOR EACH ROW OF Table_Attachment
+myAttach..Name = Table_Attachment.Long_COL
+myAttach..Content = fLoadText(Table_Attachment.Long_COL)
+Add(MyEmail..Attach,myAttach)
+END
+
+// Send Email
+FOR EACH STRING TheEmailAddress OF RCP_EDT  SEPARATED BY ","
+	IF TheEmailAddress <> "" AND TheEmailAddress <> "," THEN
+		Add(MyEmail..Recipient,TheEmailAddress)
+		IF EmailSendMessage(MySession,MyEmail,emailOptionEncodeHeader) = False THEN
+			ProgressBar1..Value = 0
+			HourGlass(False)
+			Err1_STC = ("Email sending error to: " + TheEmailAddress + CR + ErrorInfo(errMessage) + "!")
+			EmailAddress_STC = TheEmailAddress
+			IF Delete_CBox  = 1 THEN
+				HReadSeekFirst(Addresses,EmailAddress,TheEmailAddress)
+				IF HFound() THEN
+					HDelete(Addresses,hCurrentRecNum)
+				END	
+			ELSE	
+				Open(Err13_Win)
+			END	
+		ELSE
+			ProgressBar1..Value = 0
+			HourGlass(False)
+		END
+		Delete(MyEmail..Recipient,1)
+	END	
+END
+EmailCloseSession(MySession)
