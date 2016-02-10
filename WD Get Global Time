@@ -1,29 +1,30 @@
 C, L are int
-				Datum2, Line, Header, Day, Datum, GMTTime are strings
-				IF HTTPRequest("http://www.xtremecode.co.uk") THEN
-					Edit_HTTP_Result = HTTPGetResult(httpHeader)
-					Header = Edit_HTTP_Result
-					C = StringCount(Header,CR)
-					FOR L = 1 TO C
-						Line = ExtractString(Header,L,CR)
-						IF Left(Line,5) = "Date:" THEN
-							Day = Middle(Line,7,3)
-							Datum = Middle(Line,11,12)
-							GMTTime = Middle(Line,24,8)
-							Datum2 = Middle(Datum,9,4)
-							SWITCH Middle(Datum,5,3)
-								CASE = "Jan": Datum2 += "01"
-								CASE = "Feb": Datum2 += "02"
-								CASE = "Mar": Datum2 += "03"
-								CASE = "Apr": Datum2 += "04"
-								CASE = "May": Datum2 += "05"
-								CASE = "Jun": Datum2 += "06"
-								CASE = "Jul": Datum2 += "07"
-								CASE = "Aug": Datum2 += "08"
-								CASE = "Sep": Datum2 += "09"
-								CASE = "Oct": Datum2 += "10"
-								CASE = "Nov": Datum2 += "11"
-								CASE = "Dec": Datum2 += "12"
-								OTHER CASE : Datum2 += "01"
-							END	
-						END	
+Datum2, Line, Header, Day, Datum, GMTTime are strings
+IF HTTPRequest("http://www.xtremecode.co.uk") THEN
+	Edit_HTTP_Result = HTTPGetResult(httpHeader)
+	Header = Edit_HTTP_Result
+	C = StringCount(Header,CR)
+	FOR L = 1 TO C
+		Line = ExtractString(Header,L,CR)
+		IF Left(Line,5) = "Date:" THEN
+			Day = Middle(Line,7,3)
+			Datum = Middle(Line,11,12)
+			GMTTime = Middle(Line,24,8)
+			Datum2 = Middle(Datum,9,4)
+			SWITCH Middle(Datum,5,3)
+			CASE = "Jan": Datum2 += "01"
+			CASE = "Feb": Datum2 += "02"
+			CASE = "Mar": Datum2 += "03"
+			CASE = "Apr": Datum2 += "04"
+			CASE = "May": Datum2 += "05"
+			CASE = "Jun": Datum2 += "06"
+			CASE = "Jul": Datum2 += "07"
+			CASE = "Aug": Datum2 += "08"
+			CASE = "Sep": Datum2 += "09"
+			CASE = "Oct": Datum2 += "10"
+			CASE = "Nov": Datum2 += "11"
+			CASE = "Dec": Datum2 += "12"
+			OTHER CASE : Datum2 += "01"
+		END	
+	END	
+End
